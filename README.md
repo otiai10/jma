@@ -1,3 +1,5 @@
+[![Go](https://github.com/otiai10/jma/actions/workflows/go.yaml/badge.svg)](https://github.com/otiai10/jma/actions/workflows/go.yaml)
+[![codecov](https://codecov.io/gh/otiai10/jma/branch/main/graph/badge.svg?token=yeK0wKMzm7)](https://codecov.io/gh/otiai10/jma)
 
 * https://forest.watch.impress.co.jp/docs/serial/yajiuma/1309318.html
 * https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json
