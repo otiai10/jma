@@ -15,7 +15,7 @@ import (
 func TestForecastByCity(t *testing.T) {
 	r := marmoset.NewRouter()
 	r.GET("/data/forecast/130000.json", func(w http.ResponseWriter, r *http.Request) {
-		if f, err := os.Open("example_130000.json"); err != nil {
+		if f, err := os.Open("examples/130000.json"); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
 			io.Copy(w, f)
