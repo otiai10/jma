@@ -70,8 +70,8 @@ func NewClient() *Client {
 	}
 }
 
-func (client *Client) ForecastByCity(city jma.CityCode) ([]ForecastEntity, error) {
-	endpoint := fmt.Sprintf("%s/%s/%d.json", client.BaseURL, "data/forecast", city)
+func (client *Client) ForecastByCity(city jma.City) ([]ForecastEntity, error) {
+	endpoint := fmt.Sprintf("%s/%s/%s.json", client.BaseURL, "data/forecast", city.Code())
 	res, err := client.HTTPClient.Get(endpoint)
 	if err != nil {
 		return nil, err
