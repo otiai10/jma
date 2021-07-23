@@ -23,6 +23,10 @@ var (
 )
 
 type (
+	ForecastResult struct {
+		Soon ForecastEntity
+		Week ForecastEntity
+	}
 	ForecastEntity struct {
 		PublishingOffice string
 		ReportDatetime   time.Time
@@ -85,7 +89,7 @@ func NewClient() *Client {
 	}
 }
 
-func (client *Client) Forecast(pref jma.Prefecture) ([]ForecastEntity, error) {
+func (client *Client) Forecast(pref jma.Prefecture) (*ForecastResult, error) {
 
 	city := adjustCityCode(pref)
 
@@ -101,7 +105,7 @@ func (client *Client) Forecast(pref jma.Prefecture) ([]ForecastEntity, error) {
 	if err := json.NewDecoder(res.Body).Decode(&entities); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %s: %s", err.Error(), endpoint)
 	}
-	return entities, nil
+	return &ForecastResult{Soon: entities[0], Week: entities[1]}, nil
 }
 
 func (client *Client) OverviewToday(pref jma.Prefecture) (*Overview, error) {

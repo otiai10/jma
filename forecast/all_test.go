@@ -12,7 +12,7 @@ import (
 	. "github.com/otiai10/mint"
 )
 
-func TestForecastByCity(t *testing.T) {
+func TestForecast(t *testing.T) {
 	r := marmoset.NewRouter()
 	r.GET("/data/forecast/130000.json", func(w http.ResponseWriter, r *http.Request) {
 		if f, err := os.Open("examples/130000.json"); err != nil {
@@ -29,5 +29,5 @@ func TestForecastByCity(t *testing.T) {
 
 	res, err := c.Forecast(jma.Tokyo)
 	Expect(t, err).ToBe(nil)
-	Expect(t, len(res)).ToBe(2)
+	Expect(t, len(res.Week.TimeSeries[0].TimeDefines)).ToBe(7)
 }

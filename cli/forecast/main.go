@@ -54,8 +54,7 @@ func showForecast(city jma.Prefecture) error {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	fmt.Printf("%+v\n", res[0])
-	fmt.Printf("%+v\n", res[1])
+	fmt.Println(res.Soon.TimeSeries[0].Areas[0].Weathers)
 	return nil
 }
 
