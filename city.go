@@ -1,6 +1,9 @@
 package jma
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // 都道府県コード
 // http://www.kenchikushikai.or.jp/touroku/documents/code-todoufuken.pdf
@@ -60,3 +63,105 @@ const (
 	Kagoshima City = 460000
 	Okinawa   City = 470000
 )
+
+func ParseCity(s string) (City, error) {
+	name := strings.Title(strings.ToLower(s))
+	switch name {
+	case "Hokkaido":
+		return Hokkaido, nil
+	case "Aomori":
+		return Aomori, nil
+	case "Iwate":
+		return Iwate, nil
+	case "Miyagi":
+		return Miyagi, nil
+	case "Akita":
+		return Akita, nil
+	case "Yamagata":
+		return Yamagata, nil
+	case "Fukushima":
+		return Fukushima, nil
+	case "Ibaraki":
+		return Ibaraki, nil
+	case "Tochigi":
+		return Tochigi, nil
+	case "Gunma":
+		return Gunma, nil
+	case "Saitama":
+		return Saitama, nil
+	case "Chiba":
+		return Chiba, nil
+	case "Tokyo":
+		return Tokyo, nil
+	case "Kanagawa":
+		return Kanagawa, nil
+	case "Niigata":
+		return Niigata, nil
+	case "Toyama":
+		return Toyama, nil
+	case "Ishikawa":
+		return Ishikawa, nil
+	case "Fukui":
+		return Fukui, nil
+	case "Yamanashi":
+		return Yamanashi, nil
+	case "Ngano":
+		return Ngano, nil
+	case "Gifu":
+		return Gifu, nil
+	case "Shizuoka":
+		return Shizuoka, nil
+	case "Aichi":
+		return Aichi, nil
+	case "Mie":
+		return Mie, nil
+	case "Shiga":
+		return Shiga, nil
+	case "Kyoto":
+		return Kyoto, nil
+	case "Osaka":
+		return Osaka, nil
+	case "Hyogo":
+		return Hyogo, nil
+	case "Nara":
+		return Nara, nil
+	case "Wakayama":
+		return Wakayama, nil
+	case "Tottori":
+		return Tottori, nil
+	case "Shimane":
+		return Shimane, nil
+	case "Okayama":
+		return Okayama, nil
+	case "Hiroshima":
+		return Hiroshima, nil
+	case "Yamaguchi":
+		return Yamaguchi, nil
+	case "Tokushima":
+		return Tokushima, nil
+	case "Kagawa":
+		return Kagawa, nil
+	case "Ehime":
+		return Ehime, nil
+	case "Kochi":
+		return Kochi, nil
+	case "Fukuoka":
+		return Fukuoka, nil
+	case "Saga":
+		return Saga, nil
+	case "Nagasaki":
+		return Nagasaki, nil
+	case "Kumamoto":
+		return Kumamoto, nil
+	case "Oita":
+		return Oita, nil
+	case "Miyazaki":
+		return Miyazaki, nil
+	case "Kagoshima":
+		return Kagoshima, nil
+	case "Okinawa":
+		return Okinawa, nil
+	default:
+		return 0, fmt.Errorf("unknown city name: %s", name)
+	}
+}

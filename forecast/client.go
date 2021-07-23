@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/otiai10/jma"
@@ -12,6 +13,13 @@ import (
 const (
 	// https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json
 	ForecastBaseURL string = "https://www.jma.go.jp/bosai/forecast"
+)
+
+var (
+	punctuation              = regexp.MustCompile("[、。]")
+	header                   = "▶"
+	spacer                   = " "
+	maxCharCountForLineBreak = 100
 )
 
 type (
@@ -55,6 +63,13 @@ type (
 		Name string
 		Code string
 	}
+
+	Overview struct {
+		PublishingOffice string
+		ReportDatetime   time.Time
+		HeadTitle        string
+		Text             string
+	}
 )
 
 type Client struct {
@@ -70,15 +85,50 @@ func NewClient() *Client {
 	}
 }
 
-func (client *Client) ForecastByCity(city jma.City) ([]ForecastEntity, error) {
+func (client *Client) Forecast(city jma.City) ([]ForecastEntity, error) {
+
+	city = adjustCityCode(city)
+
 	endpoint := fmt.Sprintf("%s/%s/%s.json", client.BaseURL, "data/forecast", city.Code())
 	res, err := client.HTTPClient.Get(endpoint)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("http request failed: %s: %s", err.Error(), endpoint)
+	}
+	if res.StatusCode >= 400 {
+		return nil, fmt.Errorf("bad response from the server: %s: %s", res.Status, endpoint)
 	}
 	entities := []ForecastEntity{}
 	if err := json.NewDecoder(res.Body).Decode(&entities); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode response: %s: %s", err.Error(), endpoint)
 	}
 	return entities, nil
+}
+
+func (client *Client) OverviewToday(city jma.City) (*Overview, error) {
+
+	city = adjustCityCode(city)
+
+	endpoint := fmt.Sprintf("%s/%s/%s.json", client.BaseURL, "data/overview_forecast", city.Code())
+	res, err := client.HTTPClient.Get(endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("http request failed: %s: %s", err.Error(), endpoint)
+	}
+	if res.StatusCode >= 400 {
+		return nil, fmt.Errorf("bad response from the server: %s: %s", res.Status, endpoint)
+	}
+	overview := &Overview{}
+	if err := json.NewDecoder(res.Body).Decode(overview); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %s: %s", err.Error(), endpoint)
+	}
+	return overview, nil
+}
+
+func adjustCityCode(city jma.City) jma.City {
+	switch city {
+	case jma.Okinawa:
+		// https://www.jma.go.jp/bosai/forecast/#area_type=offices&area_code=471000
+		return city + 1000
+	default:
+		return city
+	}
 }

@@ -27,7 +27,7 @@ func TestForecastByCity(t *testing.T) {
 	c := NewClient()
 	c.BaseURL = s.URL
 
-	res, err := c.ForecastByCity(jma.Tokyo)
+	res, err := c.Forecast(jma.Tokyo)
 	Expect(t, err).ToBe(nil)
 	Expect(t, len(res)).ToBe(2)
 }
