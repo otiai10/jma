@@ -85,9 +85,9 @@ func NewClient() *Client {
 	}
 }
 
-func (client *Client) Forecast(city jma.City) ([]ForecastEntity, error) {
+func (client *Client) Forecast(pref jma.Prefecture) ([]ForecastEntity, error) {
 
-	city = adjustCityCode(city)
+	city := adjustCityCode(pref)
 
 	endpoint := fmt.Sprintf("%s/%s/%s.json", client.BaseURL, "data/forecast", city.Code())
 	res, err := client.HTTPClient.Get(endpoint)
@@ -104,9 +104,9 @@ func (client *Client) Forecast(city jma.City) ([]ForecastEntity, error) {
 	return entities, nil
 }
 
-func (client *Client) OverviewToday(city jma.City) (*Overview, error) {
+func (client *Client) OverviewToday(pref jma.Prefecture) (*Overview, error) {
 
-	city = adjustCityCode(city)
+	city := adjustCityCode(pref)
 
 	endpoint := fmt.Sprintf("%s/%s/%s.json", client.BaseURL, "data/overview_forecast", city.Code())
 	res, err := client.HTTPClient.Get(endpoint)
@@ -123,7 +123,7 @@ func (client *Client) OverviewToday(city jma.City) (*Overview, error) {
 	return overview, nil
 }
 
-func adjustCityCode(city jma.City) jma.City {
+func adjustCityCode(city jma.Prefecture) jma.Prefecture {
 	switch city {
 	case jma.Okinawa:
 		// https://www.jma.go.jp/bosai/forecast/#area_type=offices&area_code=471000

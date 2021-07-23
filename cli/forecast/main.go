@@ -29,7 +29,7 @@ func main() {
 	if a == "" {
 		a = "tokyo"
 	}
-	city, err := jma.ParseCity(a)
+	city, err := jma.ParsePrefecture(a)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -47,7 +47,7 @@ func main() {
 	}
 }
 
-func showForecast(city jma.City) error {
+func showForecast(city jma.Prefecture) error {
 	client := forecast.NewClient()
 	res, err := client.Forecast(city)
 	if err != nil {
@@ -59,7 +59,7 @@ func showForecast(city jma.City) error {
 	return nil
 }
 
-func showOvereview(city jma.City) error {
+func showOvereview(city jma.Prefecture) error {
 	client := forecast.NewClient()
 	ov, err := client.OverviewToday(city)
 	if err != nil {
