@@ -11,10 +11,15 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"sort"
 	"strconv"
 
 	"github.com/otiai10/jma"
+)
+
+var (
+	invalidcharsForIdentity = regexp.MustCompile("[\\s\\(\\)]")
 )
 
 type (
@@ -35,7 +40,7 @@ func (so SortableOffices) Swap(i, j int) {
 	so[i], so[j] = so[j], so[i]
 }
 
-func OfficeAreaToAstKeyValue(pos token.Pos, office jma.Area) *ast.KeyValueExpr {
+func OfficeAreaToAstValueSpec(pos token.Pos, office jma.Area) *ast.ValueSpec {
 	children := []ast.Expr{}
 	for _, ch := range office.Children {
 		children = append(children, &ast.BasicLit{
@@ -43,66 +48,66 @@ func OfficeAreaToAstKeyValue(pos token.Pos, office jma.Area) *ast.KeyValueExpr {
 			Value: doublequote(ch),
 		})
 	}
-	return &ast.KeyValueExpr{
-		Key: &ast.BasicLit{
-			Kind:     token.STRING,
-			Value:    doublequote(office.Code),
-			ValuePos: pos,
-		},
-		Value: &ast.CompositeLit{
-			Elts: []ast.Expr{
-				&ast.KeyValueExpr{
-					Key: ast.NewIdent("Code"),
-					Value: &ast.BasicLit{
-						Kind:  token.STRING,
-						Value: doublequote(office.Code),
-					},
-				},
-				&ast.KeyValueExpr{
-					Key: ast.NewIdent("Name"),
-					Value: &ast.BasicLit{
-						Kind:  token.STRING,
-						Value: doublequote(office.Name),
-					},
-				},
-				&ast.KeyValueExpr{
-					Key: ast.NewIdent("NameEn"),
-					Value: &ast.BasicLit{
-						Kind:  token.STRING,
-						Value: doublequote(office.NameEn),
-					},
-				},
-				&ast.KeyValueExpr{
-					Key: ast.NewIdent("Kana"),
-					Value: &ast.BasicLit{
-						Kind:  token.STRING,
-						Value: doublequote(office.Kana),
-					},
-				},
-				&ast.KeyValueExpr{
-					Key: ast.NewIdent("OfficeName"),
-					Value: &ast.BasicLit{
-						Kind:  token.STRING,
-						Value: doublequote(office.OfficeName),
-					},
-				},
-				&ast.KeyValueExpr{
-					Key: ast.NewIdent("Parent"),
-					Value: &ast.BasicLit{
-						Kind:  token.STRING,
-						Value: doublequote(office.Parent),
-					},
-				},
-				&ast.KeyValueExpr{
-					Key: ast.NewIdent("Children"),
-					Value: &ast.CompositeLit{
-						Type: &ast.ArrayType{
-							Elt: &ast.BasicLit{
-								Kind:  token.STRING,
-								Value: "string",
-							},
+	identity := invalidcharsForIdentity.ReplaceAllString(office.NameEn, "")
+	return &ast.ValueSpec{
+		Names: []*ast.Ident{{Name: identity, NamePos: pos}},
+		Values: []ast.Expr{
+			&ast.CompositeLit{
+				Type: ast.NewIdent("Area"),
+				Elts: []ast.Expr{
+					&ast.KeyValueExpr{
+						Key: ast.NewIdent("Code"),
+						Value: &ast.BasicLit{
+							Kind:  token.STRING,
+							Value: doublequote(office.Code),
 						},
-						Elts: children,
+					},
+					&ast.KeyValueExpr{
+						Key: ast.NewIdent("Name"),
+						Value: &ast.BasicLit{
+							Kind:  token.STRING,
+							Value: doublequote(office.Name),
+						},
+					},
+					&ast.KeyValueExpr{
+						Key: ast.NewIdent("NameEn"),
+						Value: &ast.BasicLit{
+							Kind:  token.STRING,
+							Value: doublequote(office.NameEn),
+						},
+					},
+					&ast.KeyValueExpr{
+						Key: ast.NewIdent("Kana"),
+						Value: &ast.BasicLit{
+							Kind:  token.STRING,
+							Value: doublequote(office.Kana),
+						},
+					},
+					&ast.KeyValueExpr{
+						Key: ast.NewIdent("OfficeName"),
+						Value: &ast.BasicLit{
+							Kind:  token.STRING,
+							Value: doublequote(office.OfficeName),
+						},
+					},
+					&ast.KeyValueExpr{
+						Key: ast.NewIdent("Parent"),
+						Value: &ast.BasicLit{
+							Kind:  token.STRING,
+							Value: doublequote(office.Parent),
+						},
+					},
+					&ast.KeyValueExpr{
+						Key: ast.NewIdent("Children"),
+						Value: &ast.CompositeLit{
+							Type: &ast.ArrayType{
+								Elt: &ast.BasicLit{
+									Kind:  token.STRING,
+									Value: "string",
+								},
+							},
+							Elts: children,
+						},
 					},
 				},
 			},
@@ -147,17 +152,18 @@ func GenerateArea(inputpath, outputpath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to parse file: %s: %v", outfile, err)
 	}
-	val := f.Decls[0].(*ast.GenDecl).Specs[0].(*ast.ValueSpec).Values[0].(*ast.CompositeLit)
+	val := f.Decls[0].(*ast.GenDecl)
+	// ast.Print(fset, val)
 
+	head := val.Pos()
 	line := fset.Position(val.Pos()).Line
-	file := fset.File(1)
-	val.Elts = []ast.Expr{}
+	// file := fset.File(1)
+	val.Specs = []ast.Spec{}
 	for _, o := range offices {
 		line += 1
-		file.AddLine(16 + line)
-		pos := file.LineStart(line)
-		expr := OfficeAreaToAstKeyValue(pos, o.Area)
-		val.Elts = append(val.Elts, expr)
+		pos := head + token.Pos(line*20)
+		spec := OfficeAreaToAstValueSpec(pos, o.Area)
+		val.Specs = append(val.Specs, spec)
 	}
 
 	// ast.Print(fset, val)
@@ -178,5 +184,4 @@ func GenerateArea(inputpath, outputpath string) error {
 	// }}}
 
 	return nil
-
 }
