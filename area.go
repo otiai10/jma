@@ -3,7 +3,7 @@ package jma
 
 type (
 	Area struct {
-		Code       string
+		Code       string   `json:"code"`
 		Name       string   `json:"name"`
 		NameEn     string   `json:"enName"`
 		Kana       string   `json:"kana"`
