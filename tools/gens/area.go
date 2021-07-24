@@ -40,7 +40,7 @@ func (so SortableOffices) Swap(i, j int) {
 	so[i], so[j] = so[j], so[i]
 }
 
-func OfficeAreaToAstValueSpec(pos token.Pos, office jma.Area) *ast.ValueSpec {
+func OfficeAreaToAstValueSpec(pos token.Pos, identity string, office jma.Area) *ast.ValueSpec {
 	children := []ast.Expr{}
 	for _, ch := range office.Children {
 		children = append(children, &ast.BasicLit{
@@ -48,7 +48,6 @@ func OfficeAreaToAstValueSpec(pos token.Pos, office jma.Area) *ast.ValueSpec {
 			Value: doublequote(ch),
 		})
 	}
-	identity := invalidcharsForIdentity.ReplaceAllString(office.NameEn, "")
 	return &ast.ValueSpec{
 		Names: []*ast.Ident{{Name: identity, NamePos: pos}},
 		Values: []ast.Expr{
@@ -152,34 +151,47 @@ func GenerateArea(inputpath, outputpath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to parse file: %s: %v", outfile, err)
 	}
-	val := f.Decls[0].(*ast.GenDecl)
-	// ast.Print(fset, val)
 
-	head := val.Pos()
-	line := fset.Position(val.Pos()).Line
-	// file := fset.File(1)
-	val.Specs = []ast.Spec{}
+	file := fset.File(1)
+
+	// Target 1
+	definition := f.Decls[0].(*ast.GenDecl)
+	dhead := definition.Pos()
+	dline := fset.Position(dhead).Line
+	definition.Specs = []ast.Spec{}
+
+	// Target 2
+	listed := f.Decls[1].(*ast.GenDecl).Specs[0].(*ast.ValueSpec).Values[0].(*ast.CompositeLit)
+	lhead := listed.Lbrace
+	lline := fset.Position(lhead).Line
+	listed.Elts = []ast.Expr{}
+
 	for _, o := range offices {
-		line += 1
-		pos := head + token.Pos(line*20)
-		spec := OfficeAreaToAstValueSpec(pos, o.Area)
-		val.Specs = append(val.Specs, spec)
-	}
+		identity := invalidcharsForIdentity.ReplaceAllString(o.NameEn, "")
+		dline += 1
+		lline += 1
 
-	// ast.Print(fset, val)
+		spec := OfficeAreaToAstValueSpec(file.LineStart(dline), identity, o.Area)
+		definition.Specs = append(definition.Specs, spec)
+
+		expr := &ast.BasicLit{ValuePos: file.LineStart(lline), Kind: token.STRING, Value: identity}
+		listed.Elts = append(listed.Elts, expr)
+	}
 
 	// {{{ FIXME:
 	buf := bytes.NewBuffer(nil)
 	if err := format.Node(buf, fset, f); err != nil {
-		return err
+		return fmt.Errorf("failed to format ast nodes: %v", err)
 	}
-	os.RemoveAll("./offices.go")
+	if err := os.RemoveAll("./offices.go"); err != nil {
+		return fmt.Errorf("failed to remove a file: %v", err)
+	}
 	o, err := os.Create("./offices.go")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create a new file: %v", err)
 	}
 	if _, err := io.Copy(o, buf); err != nil {
-		return err
+		return fmt.Errorf("failed to dump ast nodes to the new file: %v", err)
 	}
 	// }}}
 
