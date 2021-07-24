@@ -10,5 +10,8 @@ type (
 		OfficeName string   `json:"officeName"`
 		Parent     string   `json:"parent"`
 		Children   []string `json:"children"`
+
+		// 以下、気象庁からのデータには存在しないフィールド
+		NameEnLower string `json:"-"` // 観測所検索に使用
 	}
 )

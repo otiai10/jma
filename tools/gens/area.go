@@ -14,6 +14,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/otiai10/jma"
 )
@@ -73,6 +74,13 @@ func OfficeAreaToAstValueSpec(pos token.Pos, identity string, office jma.Area) *
 						Value: &ast.BasicLit{
 							Kind:  token.STRING,
 							Value: doublequote(office.NameEn),
+						},
+					},
+					&ast.KeyValueExpr{
+						Key: ast.NewIdent("NameEnLower"),
+						Value: &ast.BasicLit{
+							Kind:  token.STRING,
+							Value: doublequote(strings.ToLower(office.NameEn)),
 						},
 					},
 					&ast.KeyValueExpr{
@@ -156,14 +164,12 @@ func GenerateArea(inputpath, outputpath string) error {
 
 	// Target 1
 	definition := f.Decls[0].(*ast.GenDecl)
-	dhead := definition.Pos()
-	dline := fset.Position(dhead).Line
+	dline := fset.Position(definition.Lparen).Line
 	definition.Specs = []ast.Spec{}
 
 	// Target 2
 	listed := f.Decls[1].(*ast.GenDecl).Specs[0].(*ast.ValueSpec).Values[0].(*ast.CompositeLit)
-	lhead := listed.Lbrace
-	lline := fset.Position(lhead).Line
+	lline := fset.Position(listed.Lbrace).Line
 	listed.Elts = []ast.Expr{}
 
 	for _, o := range offices {
