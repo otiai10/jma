@@ -1,4 +1,4 @@
-package genweather
+package gens
 
 import (
 	"bytes"
@@ -113,8 +113,7 @@ func WeatherToAstKeyValue(pos token.Pos, weather jma.Weather) *ast.KeyValueExpr 
 	}
 }
 
-// Generate ...
-func Generate(inputpath, outputpath string) error {
+func GenerateWeather(inputpath, outputpath string) error {
 
 	input, err := os.Open(inputpath)
 	if err != nil {
