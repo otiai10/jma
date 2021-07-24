@@ -54,7 +54,7 @@ func (w Weather) SlackEmoji() string {
 	case "100":
 		return ":sunny:"
 	case "101":
-		return ":mostly_sunny"
+		return ":mostly_sunny:"
 	case "102":
 		return ":partly_sunny_rain:"
 	case "104":
