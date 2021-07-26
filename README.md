@@ -16,7 +16,7 @@ res, err := client.Forecast(jma.Fukuoka)
 
 ```zsh
 # Install
-% go install github.com/otiai10/jma/cli/forecast
+% go install github.com/otiai10/jma/cli/forecast@latest
 
 # Usage
 % forecast fukuoka
