@@ -6,11 +6,18 @@ import (
 	"net/http"
 )
 
+const (
+	DefaultForcastBaseURL = "https://www.jma.go.jp/bosai/forecast"
+)
+
 type Client struct {
 	BaseURL string
 }
 
 func (c *Client) Forecast(areacode string) ([]ComprehensiveForecastEntry, error) {
+	if c.BaseURL == "" {
+		c.BaseURL = DefaultForcastBaseURL
+	}
 	endpoint := fmt.Sprintf("%s/%s/%s.json", c.BaseURL, "data/forecast", areacode)
 	res, err := http.Get(endpoint)
 	if err != nil {

@@ -1,5 +1,30 @@
+# Yet another weather forecast API client in Japan
+
 [![Go](https://github.com/otiai10/jma/actions/workflows/go.yaml/badge.svg)](https://github.com/otiai10/jma/actions/workflows/go.yaml)
 [![codecov](https://codecov.io/gh/otiai10/jma/branch/main/graph/badge.svg?token=yeK0wKMzm7)](https://codecov.io/gh/otiai10/jma)
+
+# Client SDK
+
+```go
+import "github.com/otiai10/jma/api"
+
+client := &api.Client{}
+res, err := client.Forecast(jma.Fukuoka)
+```
+
+# CLI
+
+```zsh
+# Install
+% go install github.com/otiai10/jma/cli/forecast
+
+# Usage
+% forecast fukuoka
+		07/27	07/28	07/29	07/30	07/31	08/01	08/02
+【福岡県】	☀️  	🌤  20	🌥  30	🌤  30	🌤  20	🌤  20	🌤  20
+```
+
+# Refs
 
 * https://qiita.com/e_toyoda/items/7a293313a725c4d306c0
 * https://qiita.com/michan06/items/48503631dd30275288f7

@@ -16,6 +16,12 @@ var (
 	list    bool
 )
 
+var (
+	weeklyForecastTemplate = `		{{range .TimeDefines}}{{tfmt . "01/02"}}	{{end}}
+{{range .Areas}}【{{.Area.Name}}】	{{range .Entries}}{{.Weather.Emoji.Unicode}}  {{.PoP}}	{{end}}
+{{end}}`
+)
+
 func init() {
 	// flag.StringVar(&city, "city", "tokyo", "都市や地域の名前")
 	flag.StringVar(&baseurl, "base", "https://www.jma.go.jp/bosai/forecast", "データソースURL")
@@ -69,9 +75,3 @@ func main() {
 	table := jma.ConvertWeeklyForecast(res[1].TimeSeries[0])
 	tpl.Execute(os.Stdout, table)
 }
-
-var (
-	weeklyForecastTemplate = `		{{range .TimeDefines}}{{tfmt . "01/02"}}	{{end}}
-{{range .Areas}}【{{.Area.Name}}】	{{range .Entries}}{{.Weather.Emoji.Unicode}}  {{.PoP}}	{{end}}
-{{end}}`
-)
