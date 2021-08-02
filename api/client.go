@@ -33,3 +33,22 @@ func (c *Client) Forecast(areacode string) ([]ComprehensiveForecastEntry, error)
 	}
 	return entries, nil
 }
+
+func (c *Client) Overview(areacode string) (*OverviewWeek, error) {
+	if c.BaseURL == "" {
+		c.BaseURL = DefaultForcastBaseURL
+	}
+	endpoint := fmt.Sprintf("%s/%s/%s.json", c.BaseURL, "data/overview_week", areacode)
+	res, err := http.Get(endpoint)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	ov := &OverviewWeek{}
+	if err := json.NewDecoder(res.Body).Decode(ov); err != nil {
+		return nil, err
+	}
+
+	return ov, nil
+}

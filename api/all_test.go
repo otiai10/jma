@@ -25,6 +25,13 @@ func TestForecast(t *testing.T) {
 	Expect(t, len(res)).ToBe(2)
 }
 
+func TestClient_Overview(t *testing.T) {
+	c := &Client{BaseURL: s.URL}
+	overview, err := c.Overview("130000")
+	Expect(t, err).ToBe(nil)
+	Expect(t, overview).TypeOf("*api.OverviewWeek")
+}
+
 func createTestServer() *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
