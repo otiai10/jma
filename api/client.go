@@ -35,20 +35,24 @@ func (c *Client) Forecast(areacode string) ([]ComprehensiveForecastEntry, error)
 }
 
 func (c *Client) Overview(areacode string) (*OverviewWeek, error) {
+	return overview[OverviewWeek](c, "data/overview_week", areacode)
+}
+
+func overview[T any](c *Client, path, areacode string) (*T, error) {
 	if c.BaseURL == "" {
 		c.BaseURL = DefaultForcastBaseURL
 	}
-	endpoint := fmt.Sprintf("%s/%s/%s.json", c.BaseURL, "data/overview_week", areacode)
+	endpoint := fmt.Sprintf("%s/%s/%s.json", c.BaseURL, path, areacode)
 	res, err := http.Get(endpoint)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
-	ov := &OverviewWeek{}
-	if err := json.NewDecoder(res.Body).Decode(ov); err != nil {
+	var ov T
+	if err := json.NewDecoder(res.Body).Decode(&ov); err != nil {
 		return nil, err
 	}
+	return &ov, nil
 
-	return ov, nil
 }
