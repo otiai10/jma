@@ -29,7 +29,7 @@ func TestClient_Overview(t *testing.T) {
 	c := &Client{BaseURL: s.URL}
 	overview, err := c.Overview("130000")
 	Expect(t, err).ToBe(nil)
-	Expect(t, overview).TypeOf("*api.OverviewWeek")
+	Expect(t, overview).TypeOf("*api.OverviewForecast")
 }
 
 func createTestServer() *httptest.Server {

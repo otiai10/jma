@@ -34,8 +34,12 @@ func (c *Client) Forecast(areacode string) ([]ComprehensiveForecastEntry, error)
 	return entries, nil
 }
 
-func (c *Client) Overview(areacode string) (*OverviewWeek, error) {
+func (c *Client) OverviewWeek(areacode string) (*OverviewWeek, error) {
 	return overview[OverviewWeek](c, "data/overview_week", areacode)
+}
+
+func (c *Client) Overview(areacode string) (*OverviewForecast, error) {
+	return overview[OverviewForecast](c, "data/overview_forecast", areacode)
 }
 
 func overview[T any](c *Client, path, areacode string) (*T, error) {
